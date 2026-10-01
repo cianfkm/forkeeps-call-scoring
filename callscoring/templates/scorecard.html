@@ -30,7 +30,8 @@
   ul { margin: 2pt 0 6pt 14pt; padding: 0; } li { margin: 0 0 2pt; }
   td ul { margin: 0 0 0 11pt; }
   a { color: var(--navy); text-decoration: none; font-weight: bold; }
-  .call { break-inside: avoid-page; }
+  .call, .keep { break-inside: avoid-page; }
+  td.nw { white-space: nowrap; }
   .ctx { font-style: italic; color: #444; margin: 0 0 4pt; }
   .script { font-style: italic; }
 </style>
@@ -60,7 +61,7 @@
 {% if baseline %}<div class="panel"><b>Baseline, not a performance mark.</b> {{ baseline }}</div>{% endif %}
 
 <!-- 4. Call scores -->
-<h2>Call Scores</h2>
+<div class="keep"><h2>Call Scores</h2>
 <table>
   <tr><th>Day</th><th>Customer</th><th>Company</th><th class="c">Length</th><th class="c">Overall</th><th class="c">Must-Ask</th><th class="c">Listen</th></tr>
   {% for c in calls %}
@@ -71,22 +72,24 @@
   <tr class="total"><td colspan="4">Week average</td><td class="c {{ snap.overall_band }}">{{ snap.overall }} / 9 · {{ snap.overall_pct }}%</td><td class="c {{ snap.must_band }}">{{ snap.must }}</td><td></td></tr>
 </table>
 <div class="key">Green 67%+ &nbsp;•&nbsp; Amber 40 to 66% &nbsp;•&nbsp; Red under 40%</div>
+</div>
 
 <!-- 5. Step scores -->
-<h2>Step Scores</h2>
+<div class="keep"><h2>Step Scores</h2>
 <table>
   <tr><th class="c">#</th><th>Step</th><th class="c">/{{ n_scored }}</th><th>Pattern</th></tr>
   {% for s in steps %}
   <tr><td class="c">{{ s.n }}</td><td>{% if s.must_ask %}⭐ {% endif %}{{ s.name }}</td><td class="c {{ s.band }}">{{ s.score }}</td><td>{{ s.pattern }}</td></tr>
   {% endfor %}
-  <tr class="total"><td></td><td>Total</td><td class="c {{ snap.overall_band }}">{{ grand }} / {{ grand_max }}</td><td>{{ snap.overall_pct }}%</td></tr>
+  <tr class="total"><td></td><td>Total</td><td class="c nw {{ snap.overall_band }}">{{ grand }} / {{ grand_max }}</td><td>{{ snap.overall_pct }}%</td></tr>
 </table>
 
+</div>
 <!-- 6. Headline pattern -->
 <div class="panel"><b>Headline pattern:</b> {{ summary.headline }}</div>
 
 <!-- 7. Step grid -->
-<h2>Step Grid</h2>
+<div class="keep"><h2>Step Grid</h2>
 <div class="key">Y = asked and answered &nbsp;•&nbsp; P = partial, customer led or incomplete &nbsp;•&nbsp; M = missed</div>
 <table>
   <tr><th>Call</th>{% for s in steps %}<th class="c">{{ s.n }}{% if s.must_ask %}⭐{% endif %}</th>{% endfor %}<th class="c">Total</th></tr>
@@ -95,6 +98,7 @@
   {% endfor %}
 </table>
 
+</div>
 <!-- 8. Strengths / 9. Gaps -->
 <h2>Strengths</h2>
 <ul>{% for x in summary.strengths %}<li>{{ x }}</li>{% endfor %}</ul>
@@ -102,7 +106,7 @@
 <ul>{% for x in summary.gaps %}<li>{{ x }}</li>{% endfor %}</ul>
 
 <!-- 10. Priority actions -->
-<h2>Priority Actions</h2>
+<div class="keep"><h2>Priority Actions</h2>
 <table>
   <tr><th style="width:20%">Priority</th><th style="width:40%">Evidence</th><th style="width:26%">Script</th><th style="width:14%" class="c">Target</th></tr>
   {% for a in actions %}
@@ -111,10 +115,11 @@
       <td class="script">{{ a.script }}</td><td class="c">{{ a.target }}</td></tr>
   {% endfor %}
 </table>
+</div>
 <p><b>Also monitor:</b> {{ summary.also_monitor }}</p>
 
 <!-- 11. Flagged for follow up -->
-<h2>Flagged for Follow Up</h2>
+<div class="keep"><h2>Flagged for Follow Up</h2>
 {% if summary.follow_ups %}
 <table>
   <tr><th style="width:28%">Deal</th><th>Why</th><th style="width:30%">Action</th></tr>
@@ -122,6 +127,7 @@
 </table>
 {% else %}<p>None this week.</p>{% endif %}
 
+</div>
 <!-- 12. Call by call -->
 <h2>Call by Call</h2>
 {% for c in calls %}
