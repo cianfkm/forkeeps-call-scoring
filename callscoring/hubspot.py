@@ -29,6 +29,9 @@ def hs(method, path, **kw):
 
 def check_owner(rep):
     r = requests.get(f"{HS}/crm/v3/owners/{rep['owner_id']}", headers={"Authorization": f"Bearer {TOKEN}"}, timeout=60)
+    if r.status_code in (401, 403):
+        raise RuntimeError(f"HubSpot {r.status_code} reading owners: HUBSPOT_TOKEN is invalid or missing a scope "
+                           f"(needs crm.objects.owners.read). HubSpot said: {r.text[:400]}")
     if r.status_code != 200:
         raise RuntimeError(f"{rep['full']}: owner ID {rep['owner_id']} not found in HubSpot ({r.status_code}). Left or deactivated?")
     o = r.json()
