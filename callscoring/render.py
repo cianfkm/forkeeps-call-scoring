@@ -108,5 +108,5 @@ def to_pdf(html_text, path):
         page = browser.new_page()
         page.set_content(html_text, wait_until="load")
         page.pdf(path=path, format="A4", print_background=True,
-                 margin={"top": "16mm", "bottom": "16mm", "left": "14mm", "right": "14mm"})
+                 margin={"top": "14mm", "bottom": "14mm", "left": "14mm", "right": "14mm"})
         browser.close()
