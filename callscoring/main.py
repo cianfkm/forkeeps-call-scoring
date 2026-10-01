@@ -30,6 +30,8 @@ def run_rep(rep, friday, start, end, out):
     print(f"  {calls_made} calls made, {len(long_calls)} over 2 min, {len(kept)} in scope, {len(dropped)} dropped")
     for d in dropped:
         log_drop(d)
+    for k in kept:
+        print(f"    KEEP {k['customer']} (call {k['hs_id']})" + (f"  note: {k['note']}" if k.get("note") else ""))
 
     # Transcripts: a call without one stays in "calls made", is excluded from scoring and listed
     not_scored, to_score = [], []

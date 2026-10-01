@@ -97,12 +97,21 @@ def associations(from_type, to_type, ids):
     return out
 
 
-def batch_read(obj, ids, props):
+def batch_read(obj, ids, props, history=None):
+    """{id: properties}. With `history`, each record also gets "_history": {prop: [{value, ms}, ...] newest first}."""
     out = {}
     ids = list(dict.fromkeys(str(i) for i in ids))
-    for i in range(0, len(ids), 100):
-        data = hs("POST", f"/crm/v3/objects/{obj}/batch/read",
-                  json={"inputs": [{"id": x} for x in ids[i:i + 100]], "properties": props})
+    size = 50 if history else 100  # HubSpot caps history reads at 50 records per batch
+    for i in range(0, len(ids), size):
+        body = {"inputs": [{"id": x} for x in ids[i:i + size]], "properties": props}
+        if history:
+            body["propertiesWithHistory"] = history
+        data = hs("POST", f"/crm/v3/objects/{obj}/batch/read", json=body)
         for row in data.get("results", []):
-            out[str(row["id"])] = row["properties"]
+            p = dict(row["properties"])
+            if history:
+                p["_history"] = {k: sorted(({"value": h.get("value"), "ms": parse_ms(h.get("timestamp"))} for h in v),
+                                           key=lambda h: -h["ms"])
+                                 for k, v in (row.get("propertiesWithHistory") or {}).items()}
+            out[str(row["id"])] = p
     return out
