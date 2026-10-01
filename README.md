@@ -5,7 +5,7 @@ Replaces Rory's Cowork task. Report content, structure, tone and colours: `docs/
 
 - **Schedule:** Monday ~7am Melbourne, previous Mon to Fri week (`.github/workflows/score.yml`).
 - **On demand:** `/call-scoring`, `/call-scoring leanne`, `/call-scoring all 2026-08-28` in #pipeline-briefings
-  (anyone in that private channel). Handler lives in the `pipeline-briefings` repo, `slack-command/api/call-scoring.js`, Vercel project `pipeline-briefings-slack`.
+  (anyone in that private channel). Handler lives in the `pipeline-briefings` repo, `slack-command/api/slack/call-scoring.js`, Vercel project `pipeline-briefings-slack`.
   Or: Actions tab > Call scorecards > Run workflow.
 - **Config (no code changes needed):**
   - `config/reps.yaml` roster, HubSpot owner IDs, start dates (Baseline panel). Niamh is never scored.
