@@ -43,7 +43,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           # C0C43USSFTK, #pipeline-briefings (private: Niamh, Rory, Cian)
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: always()
         with:
           name: scorecards
