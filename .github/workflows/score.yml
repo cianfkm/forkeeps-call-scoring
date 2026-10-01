@@ -41,7 +41,7 @@ jobs:
           DIALPAD_API_KEY: ${{ secrets.DIALPAD_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          # Test channel until Cian approves, then C0C43USSFTK (#pipeline-briefings)
+          # C0C43USSFTK, #pipeline-briefings (private: Niamh, Rory, Cian)
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
       - uses: actions/upload-artifact@v4
         if: always()
