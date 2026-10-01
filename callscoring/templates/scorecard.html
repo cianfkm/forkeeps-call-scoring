@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>{{ title }}</title>
+<style>
+  /* v6 section 6 colours */
+  :root { --green:#d9ead3; --amber:#fff2cc; --red:#f4cccc; --navy:#1c4587; --panel:#e8eaf6; }
+  @page { size: A4; margin: 16mm 14mm; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 9.5pt; color: #222; line-height: 1.35; }
+  h1 { color: var(--navy); font-size: 20pt; margin: 0 0 2pt; }
+  h2 { color: var(--navy); font-size: 13pt; margin: 16pt 0 6pt; break-after: avoid; }
+  h3 { color: var(--navy); font-size: 11pt; margin: 14pt 0 2pt; break-after: avoid; }
+  .meta { color: #555; margin-bottom: 6pt; }
+  .panel { background: var(--panel); padding: 7pt 9pt; margin: 6pt 0; border-radius: 2pt; }
+  .panel.green { background: var(--green); } .panel.amber { background: var(--amber); } .panel.red { background: var(--red); }
+  table { border-collapse: collapse; width: 100%; margin: 4pt 0; break-inside: auto; }
+  tr { break-inside: avoid; }
+  th { background: var(--navy); color: #fff; font-weight: bold; text-align: left; padding: 4pt 5pt; font-size: 9pt; }
+  td { border: 0.5pt solid #c8c8c8; padding: 3.5pt 5pt; vertical-align: top; }
+  td.c, th.c { text-align: center; }
+  .green { background: var(--green); } .amber { background: var(--amber); } .red { background: var(--red); }
+  tr.total td { font-weight: bold; background: #f3f3f3; }
+  .key { font-size: 8pt; color: #555; margin: 2pt 0 8pt; break-after: avoid; }
+  .tiles { display: flex; gap: 6pt; margin: 4pt 0 8pt; }
+  .tile { flex: 1; padding: 7pt; text-align: center; border-radius: 2pt; background: var(--panel); }
+  .tile .lbl { font-size: 8pt; color: #444; text-transform: uppercase; letter-spacing: .3pt; }
+  .tile .big { font-size: 17pt; font-weight: bold; color: var(--navy); margin: 2pt 0; }
+  .tile .sub { font-size: 8pt; color: #444; }
+  ul { margin: 2pt 0 6pt 14pt; padding: 0; } li { margin: 0 0 2pt; }
+  td ul { margin: 0 0 0 11pt; }
+  a { color: var(--navy); text-decoration: none; font-weight: bold; }
+  .call { break-inside: avoid-page; }
+  .ctx { font-style: italic; color: #444; margin: 0 0 4pt; }
+  .script { font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- 1. Title block -->
+<h1>Call Scorecard: {{ rep }}</h1>
+<div class="meta">Week ending {{ week_long }} &nbsp;•&nbsp; {{ n_scored }} calls scored &nbsp;•&nbsp; Generated {{ generated }}</div>
+<div class="panel">Scope: first calls to new enquiries logged as an opportunity, over 2 minutes. {{ calls_made }} calls made that week; {{ n_in_scope }} met scope.{% if not_scored %} Not scored, no transcript: {{ not_scored | join(", ") }}.{% endif %}</div>
+
+{% if n_scored == 0 %}
+<div class="panel">No calls met scope this week, so there is nothing to score.</div>
+{% else %}
+
+<!-- 2. Snapshot -->
+<h2>Snapshot</h2>
+<div class="tiles">
+  <div class="tile {{ snap.overall_band }}"><div class="lbl">Overall</div><div class="big">{{ snap.overall_pct }}%</div><div class="sub">{{ snap.overall }} / 9</div></div>
+  <div class="tile {{ snap.must_band }}"><div class="lbl">Must-Ask</div><div class="big">{{ snap.must }}</div><div class="sub">out of 4</div></div>
+  <div class="tile {{ snap.best_band }}"><div class="lbl">Best step</div><div class="big">{{ snap.best_score }}</div><div class="sub">{{ snap.best_name }} /{{ n_scored }}</div></div>
+  <div class="tile {{ snap.weak_band }}"><div class="lbl">Weakest step</div><div class="big">{{ snap.weak_score }}</div><div class="sub">{{ snap.weak_name }} /{{ n_scored }}</div></div>
+  <div class="tile"><div class="lbl">Avg length</div><div class="big">{{ snap.avg_len }}</div><div class="sub">{{ snap.len_range }}</div></div>
+</div>
+
+<!-- 3. Baseline panel (only when applicable) -->
+{% if baseline %}<div class="panel"><b>Baseline, not a performance mark.</b> {{ baseline }}</div>{% endif %}
+
+<!-- 4. Call scores -->
+<h2>Call Scores</h2>
+<table>
+  <tr><th>Day</th><th>Customer</th><th>Company</th><th class="c">Length</th><th class="c">Overall</th><th class="c">Must-Ask</th><th class="c">Listen</th></tr>
+  {% for c in calls %}
+  <tr><td>{{ c.day_short }}</td><td>{{ c.customer }}</td><td>{{ c.company }}</td><td class="c">{{ c.length }}</td>
+      <td class="c {{ c.band }}">{{ c.overall }} / 9 · {{ c.pct }}%</td><td class="c {{ c.must_band }}">{{ c.must }}</td>
+      <td class="c">{% if c.listen_url %}<a href="{{ c.listen_url }}">▶ Listen</a>{% endif %}</td></tr>
+  {% endfor %}
+  <tr class="total"><td colspan="4">Week average</td><td class="c {{ snap.overall_band }}">{{ snap.overall }} / 9 · {{ snap.overall_pct }}%</td><td class="c {{ snap.must_band }}">{{ snap.must }}</td><td></td></tr>
+</table>
+<div class="key">Green 67%+ &nbsp;•&nbsp; Amber 40 to 66% &nbsp;•&nbsp; Red under 40%</div>
+
+<!-- 5. Step scores -->
+<h2>Step Scores</h2>
+<table>
+  <tr><th class="c">#</th><th>Step</th><th class="c">/{{ n_scored }}</th><th>Pattern</th></tr>
+  {% for s in steps %}
+  <tr><td class="c">{{ s.n }}</td><td>{% if s.must_ask %}⭐ {% endif %}{{ s.name }}</td><td class="c {{ s.band }}">{{ s.score }}</td><td>{{ s.pattern }}</td></tr>
+  {% endfor %}
+  <tr class="total"><td></td><td>Total</td><td class="c {{ snap.overall_band }}">{{ grand }} / {{ grand_max }}</td><td>{{ snap.overall_pct }}%</td></tr>
+</table>
+
+<!-- 6. Headline pattern -->
+<div class="panel"><b>Headline pattern:</b> {{ summary.headline }}</div>
+
+<!-- 7. Step grid -->
+<h2>Step Grid</h2>
+<div class="key">Y = asked and answered &nbsp;•&nbsp; P = partial, customer led or incomplete &nbsp;•&nbsp; M = missed</div>
+<table>
+  <tr><th>Call</th>{% for s in steps %}<th class="c">{{ s.n }}{% if s.must_ask %}⭐{% endif %}</th>{% endfor %}<th class="c">Total</th></tr>
+  {% for c in calls %}
+  <tr><td>{{ c.customer }}</td>{% for r in c.ratings %}<td class="c {{ {'Y':'green','P':'amber','M':'red'}[r] }}">{{ r }}</td>{% endfor %}<td class="c {{ c.band }}">{{ c.overall }}</td></tr>
+  {% endfor %}
+</table>
+
+<!-- 8. Strengths / 9. Gaps -->
+<h2>Strengths</h2>
+<ul>{% for x in summary.strengths %}<li>{{ x }}</li>{% endfor %}</ul>
+<h2>Gaps</h2>
+<ul>{% for x in summary.gaps %}<li>{{ x }}</li>{% endfor %}</ul>
+
+<!-- 10. Priority actions -->
+<h2>Priority Actions</h2>
+<table>
+  <tr><th style="width:20%">Priority</th><th style="width:40%">Evidence</th><th style="width:26%">Script</th><th style="width:14%" class="c">Target</th></tr>
+  {% for a in actions %}
+  <tr><td><b>{{ loop.index }}. {{ a.title }}</b><br>Step {{ a.step }}<br><span class="{{ a.band }}">{{ a.score }} / {{ n_scored }}</span></td>
+      <td><ul>{% for e in a.evidence %}<li>{{ e }}</li>{% endfor %}</ul></td>
+      <td class="script">{{ a.script }}</td><td class="c">{{ a.target }}</td></tr>
+  {% endfor %}
+</table>
+<p><b>Also monitor:</b> {{ summary.also_monitor }}</p>
+
+<!-- 11. Flagged for follow up -->
+<h2>Flagged for Follow Up</h2>
+{% if summary.follow_ups %}
+<table>
+  <tr><th style="width:28%">Deal</th><th>Why</th><th style="width:30%">Action</th></tr>
+  {% for f in summary.follow_ups %}<tr><td>{{ f.deal }}</td><td>{{ f.why }}</td><td>{{ f.action }}</td></tr>{% endfor %}
+</table>
+{% else %}<p>None this week.</p>{% endif %}
+
+<!-- 12. Call by call -->
+<h2>Call by Call</h2>
+{% for c in calls %}
+<div class="call">
+  <h3>Call {{ loop.index }} &nbsp;•&nbsp; {{ c.customer }}{% if c.company %}, {{ c.company }}{% endif %}</h3>
+  <div class="meta">{{ c.day_med }} &nbsp;•&nbsp; {{ c.length }} &nbsp;•&nbsp; {{ c.overall }} / 9 · {{ c.pct }}% &nbsp;•&nbsp; Must-Ask {{ c.must }} / 4{% if c.listen_url %} &nbsp;•&nbsp; <a href="{{ c.listen_url }}">▶ Listen</a>{% endif %}</div>
+  <p class="ctx">{{ c.context }}</p>
+  <table>
+    <tr><th class="c" style="width:4%">#</th><th style="width:18%">Step</th><th class="c" style="width:8%">Score</th><th>What happened</th></tr>
+    {% for s in c.steps %}
+    <tr><td class="c">{{ s.n }}</td><td>{% if s.must_ask %}⭐ {% endif %}{{ s.short }}</td><td class="c {{ {'Y':'green','P':'amber','M':'red'}[s.rating] }}">{{ s.rating }}</td><td>{{ s.what_happened }}</td></tr>
+    {% endfor %}
+  </table>
+  <div class="panel {{ c.panel_class }}"><b>{{ c.panel_label }}:</b> {{ c.panel_text }}</div>
+</div>
+{% endfor %}
+
+{% endif %}
+</body>
+</html>

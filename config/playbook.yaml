@@ -1,0 +1,60 @@
+# The nine topics of the live Dialpad "For Keeps Sales Call" playbook (created 18 Aug 2026 by Rory Boyle),
+# copied from Dialpad > Playbooks on 1 Oct 2026. All wording below is LIVE.
+# `definition` is Dialpad's topic description and tells the scorer what the step requires.
+# `script` is quoted VERBATIM in the Priority Actions table. Never paraphrase it; if the
+# playbook changes in Dialpad, paste the new wording here.
+steps:
+  - n: 1
+    name: Check now is a good time to talk
+    short: Opening line
+    must_ask: false
+    definition: Agent checks it is a good time to talk and flags upfront that they will be asking about needs, timeline and budget.
+    script: '"Is now a good time? I want to check a few details around your needs, timeline and budget. Is that okay?"'
+  - n: 2
+    name: Merch purpose and alternatives
+    short: Merch purpose
+    must_ask: false
+    definition: Agent uncovers what the merchandise is being used for and whether the customer would consider alternative products.
+    script: '"What is the merch for? Are you set on this, or open to alternatives?"'
+  - n: 3
+    name: Branding requirements
+    short: Branding
+    must_ask: false
+    definition: 'Agent gathers the branding specifications for the quote: print method, number of logo colours and logo placement on the product.'
+    script: '"In terms of branding, is there anything I should know?"'
+  - n: 4
+    name: Delivery deadline
+    short: Deadline
+    must_ask: false
+    definition: Agent establishes the date the customer needs the merchandise delivered by.
+    script: '"When would you ideally need everything delivered by?"'
+  - n: 5
+    name: Budget or price range
+    short: Budget
+    must_ask: true
+    definition: Agent establishes the customer's budget or price range for this order. A rough range is acceptable. No budget is not an acceptable answer.
+    script: '"Do you have a budget in mind for this order?" If they will not say: "Are we talking closer to $5 a unit or $25 a unit?"'
+  - n: 6
+    name: Competing quotes or existing supplier
+    short: Competing quotes
+    must_ask: true
+    definition: Agent finds out whether the customer is getting quotes from other suppliers or already works with an existing merchandise supplier.
+    script: '"Are you getting multiple quotes, or do you have an existing supplier?"'
+  - n: 7
+    name: Approval and decision process
+    short: Approval process
+    must_ask: true
+    definition: Agent finds out what the customer needs in order to get the job approved and who makes the final decision.
+    script: '"What do you need to get this approved, and who signs off?"'
+  - n: 8
+    name: Other products to quote
+    short: Other products
+    must_ask: true
+    definition: Agent asks whether there are other products the customer needs quoted now or is likely to need in the future.
+    script: '"Are there any other products I can quote for you?"'
+  - n: 9
+    name: Next steps and quote delivery
+    short: Next steps
+    must_ask: false
+    definition: Agent confirms a specific time the quote will be sent and asks the customer to respond once they have it.
+    script: '"I will send the quote by [time]. Let me know if you want to move ahead or if I have missed anything."'

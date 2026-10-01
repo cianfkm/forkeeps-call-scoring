@@ -1,0 +1,51 @@
+name: Call scorecards
+
+on:
+  schedule:
+    # Sunday 20:00 UTC = Monday 7am AEDT (6am AEST). Scores the previous Mon to Fri week.
+    - cron: "0 20 * * 0"
+  workflow_dispatch:
+    inputs:
+      rep:
+        description: "Rep first or full name, comma-separated, or all"
+        required: false
+        default: "all"
+      week_ending:
+        description: "Friday of the week to score, YYYY-MM-DD (blank = last week)"
+        required: false
+        default: ""
+      no_post:
+        description: "Dry run: PDFs to the run's artifacts only, nothing posted to Slack"
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  score:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m playwright install --with-deps chromium
+      - run: >
+          python -m callscoring.main
+          --rep "${{ inputs.rep || 'all' }}"
+          --week-ending "${{ inputs.week_ending }}"
+          ${{ inputs.no_post && '--no-post' || '' }}
+        env:
+          HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
+          DIALPAD_API_KEY: ${{ secrets.DIALPAD_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          # Test channel until Cian approves, then C0C43USSFTK (#pipeline-briefings)
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scorecards
+          path: out/
+          if-no-files-found: ignore

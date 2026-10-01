@@ -1,0 +1,11 @@
+# Reps scored by the weekly call scorecard. Do NOT add Niamh Hamilton (sales manager).
+# owner_id must resolve via the HubSpot owners API; the run fails loudly if not.
+# start_date drives the v6 Baseline panel (shown for the first 4 weeks). Leave blank if not new.
+reps:
+  - {name: Aoife,   full: Aoife Cripps,    owner_id: "1217171174", start_date: }
+  - {name: Leilani, full: Leilani Goodall, owner_id: "82237377",   start_date: }
+  - {name: Jamie,   full: Jamie Hunt,      owner_id: "87580621",   start_date: }
+  - {name: Leanne,  full: Leanne Cooper,   owner_id: "93213822",   start_date: }
+  - {name: Emma,    full: Emma Naughton,   owner_id: "1286204956", start_date: }
+  - {name: Zoe,     full: Zoe Dragoi,      owner_id: "97594517",   start_date: }   # TODO start date from Cian
+  - {name: Jack,    full: Jack Colleran,   owner_id: "96176022",   start_date: }   # TODO start date from Cian

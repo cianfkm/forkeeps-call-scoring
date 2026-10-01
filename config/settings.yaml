@@ -1,0 +1,10 @@
+# Qualification thresholds (v6 section 3). Tune here, not in code.
+MIN_CALL_MS: 120000              # calls must be over 2 minutes
+NEW_CONTACT_WINDOW_DAYS: 14      # contact created within this many days before the call
+REPEAT_RULE: longest             # repeat calls to the same contact in the week: keep the longest
+LIFECYCLE_STAGE: opportunity
+DEAL_TYPE_PROPERTY: deal_type_system   # "Deal type (system)"
+DEAL_TYPE_VALUE: New Business          # stored value; compared case-insensitively
+BASELINE_WEEKS: 4                # Baseline panel shows while the rep is within this many weeks of start_date
+
+MODEL: claude-sonnet-5-5
