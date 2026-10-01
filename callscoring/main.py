@@ -26,7 +26,7 @@ def run_rep(rep, friday, start, end, out):
     hubspot.check_owner(rep)
     calls_made = hubspot.count_calls(rep["owner_id"], start, end)
     long_calls = hubspot.search_calls(rep["owner_id"], start, end, min_ms=SETTINGS["MIN_CALL_MS"])
-    kept, dropped = qualify(long_calls)
+    kept, dropped = qualify(long_calls, int(start.timestamp() * 1000))
     print(f"  {calls_made} calls made, {len(long_calls)} over 2 min, {len(kept)} in scope, {len(dropped)} dropped")
     for d in dropped:
         log_drop(d)

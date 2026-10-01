@@ -1,9 +1,10 @@
 """Keep only first calls to genuinely new enquiries (v6 section 3 / brief 4.3). Log every drop."""
 import html
 import re
+from datetime import datetime
 
 from . import hubspot
-from .config import SETTINGS
+from .config import SETTINGS, TZ
 
 DAY_MS = 86_400_000
 LINK_RE = re.compile(r"https?://dialpad\.com/callhistory/callreview/(\d+)[^\s\"'<>]*")
@@ -58,8 +59,16 @@ def _contact_reason(c, call_ms, deals):
     return f"no New Business deal (deal types: {', '.join(sorted({t or 'blank' for t in types}))})", None
 
 
-def qualify(calls):
-    """calls: HubSpot call records (already >2 min). Returns (kept, dropped)."""
+def display_name(ct):
+    """HubSpot often has the full name (sometimes ", Company") typed into firstname; avoid "Jeremy Simon Simon"."""
+    first, last = (ct.get("firstname") or "").strip(), (ct.get("lastname") or "").strip()
+    name = first if last and last.lower() in first.lower() else " ".join(x for x in (first, last) if x)
+    name = name.split(",")[0].strip()
+    return (name.title() if name.islower() else name) or "(no name)"
+
+
+def qualify(calls, week_start_ms):
+    """calls: HubSpot call records (already >2 min) in the week. Returns (kept, dropped)."""
     call_contacts = hubspot.associations("calls", "contacts", [c["id"] for c in calls])
     contact_ids = {x for ids in call_contacts.values() for x in ids}
     contacts = hubspot.batch_read("contacts", contact_ids, hubspot.CONTACT_PROPS, history=["lifecyclestage"])
@@ -91,7 +100,7 @@ def qualify(calls):
         ct = contacts[cid]
         dp_id, link = dialpad_link(p.get("hs_call_body"))
         kept.append({**base, "contact_id": cid,
-                     "customer": " ".join(x for x in [ct.get("firstname"), ct.get("lastname")] if x).strip() or "(no name)",
+                     "customer": display_name(ct),
                      "company": (ct.get("company") or "").strip(),
                      "deals": [d.get("dealname") for d in cdeals if d.get("dealname")],
                      "dialpad_id": dp_id, "listen_url": link, "body": p.get("hs_call_body") or "", "note": note})
@@ -111,6 +120,22 @@ def qualify(calls):
             if g is not best:
                 dropped.append({**{k: g[k] for k in ("hs_id", "ts_ms", "duration_ms", "title", "to_number")},
                                 "reason": f"repeat call to {g['customer']} (kept call {best['hs_id']}, rule {SETTINGS['REPEAT_RULE']})"})
-    final.sort(key=lambda x: x["ts_ms"])
+    # First calls only: a contact already called (over 2 min) before this week is a follow-up, not a new enquiry
+    contact_calls = hubspot.associations("contacts", "calls", {k["contact_id"] for k in final})
+    history = hubspot.batch_read("calls", {x for ids in contact_calls.values() for x in ids},
+                                 ["hs_timestamp", "hs_call_duration"])
+    first_calls = []
+    for k in final:
+        earlier = [hubspot.parse_ms(history[x].get("hs_timestamp")) for x in contact_calls.get(k["contact_id"], [])
+                   if x in history and x != k["hs_id"]
+                   and int(float(history[x].get("hs_call_duration") or 0)) > SETTINGS["MIN_CALL_MS"]
+                   and hubspot.parse_ms(history[x].get("hs_timestamp")) < week_start_ms]
+        if earlier:
+            when = datetime.fromtimestamp(max(earlier) / 1000, TZ)
+            dropped.append({**{f: k[f] for f in ("hs_id", "ts_ms", "duration_ms", "title", "to_number")},
+                            "reason": f"follow-up, not a first call: {k['customer']} was already called on {when:%a %d %b}"})
+        else:
+            first_calls.append(k)
+    first_calls.sort(key=lambda x: x["ts_ms"])
     dropped.sort(key=lambda x: x["ts_ms"])
-    return final, dropped
+    return first_calls, dropped

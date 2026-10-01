@@ -29,9 +29,20 @@ REGISTER = """Register and conventions (these are hard rules):
 
 THREE_TIER = """Three-tier rule, applied to what the REP did (equal weighting, ignore any point values in training material):
 - Y (Yes) = the rep asked and got a usable answer.
-- P (Partial) = the customer volunteered it without being asked; or the rep raised it but accepted a non-answer; or the apparent credit is a false positive (for example the rep mentioning our own supplier is NOT a competing-quotes conversation).
+- P (Partial) = the customer volunteered it without being asked; or the rep raised it but accepted a non-answer or an incomplete one.
 - M (Missed) = no evidence in the call.
-Score the rep's actual questions, not whether the subject came up. A subject the customer raised is at most P."""
+Score the rep's actual questions, not whether the subject came up. A subject the customer raised is at most P.
+
+Step standards (calibrated against the verified reference report; apply exactly):
+1. Opening line. Y needs BOTH a check that now is a good time AND flagging that needs, timeline and budget will be covered. P = only one element: a time or permission check ("a couple of questions, if that's okay?") or a stated reason for calling, without the agenda flag. M = straight into business.
+2. Merch purpose. Y = rep asked what the merch is for (and ideally openness to alternatives). P = customer volunteered the purpose, or rep only covered alternatives. M = purpose never established.
+3. Branding. Y = rep gathered the specifications: print method, number of logo colours and placement. P = branding or the logo came up (from either side, including "price includes full logo print" or "I've got the logo") but the specifications were not confirmed. M = branding not discussed at all.
+4. Deadline. Y = a specific delivery date was pinned, or the rep worked a firm due date back from the customer's date. A window or vague timing ("a week or two", "mid October", "end of September", "school holidays") is P even when the rep asked. Customer-volunteered timing is P. M = no timing established.
+5. Budget. Y = the rep asked AND obtained a clear, usable figure or range before quoting. P = the customer volunteered a figure or set the anchor ("can you do about $600?"); the rep offered rather than asked ("if you have a figure, happy to help"); or the figure was unclear, inconsistent or never confirmed. M = budget never came up.
+6. Competing quotes. Y = rep asked about other quotes or an existing supplier and got an answer. P = the customer revealed it unprompted ("there was another quote", holding another supplier's invoice, researching other websites) and it was not explored. A mention of OUR OWN supplier (for example our supplier making a mockup) is not evidence for this step. M = nothing.
+7. Approval. Y = rep asked what is needed for approval or who signs off, and got an answer. P = the customer mentioned an approver, a team or a head office unprompted and it was not explored. M = nothing.
+8. Other products. Y = rep asked whether anything else needs quoting now or in future. P = the customer raised extra products unprompted, or rep only took on alternatives. M = nothing.
+9. Next steps. Y = rep committed to sending the quote with a timeframe the customer can rely on ("now", "within the hour", "by close of play tomorrow"), so the customer knows what to expect. Asking the customer to reply is good practice but NOT required for Y. P = a soft or customer-led close with no quote commitment ("send it over and I'll have a look"). M = no next step."""
 
 
 def _rubric():
@@ -65,7 +76,7 @@ Calibration examples from a verified reference report (style and strictness to m
 - Opening line, M: "No permission bridge. The call opened with the reason for ringing and moved directly into confirming quantities and the due date."
 - Merch purpose, P: "Customer volunteered that the items were for a client gift box. The question was not asked, so the occasion, the audience and the spend per box were never explored."
 - Budget, P: "Offered rather than asked: \\"if you do have a figure at any point you are looking to work towards, I'm happy to help with that as well.\\" The customer did not respond with a number and it was not revisited."
-- Competing quotes, M: "Not asked. Dialpad credited this step because the rep mentioned our own supplier making a mockup, which is a false positive."
+- Competing quotes, M: "Not asked. The only supplier mentioned was our own, making a mockup, which is not a competing quote."
 - Deadline, Y: "Customer gave 12 September. Rep worked backwards against the ten business day lead time and proposed a 9 September due date. Handled properly."
 - Biggest miss panel: "the customer said she had put in a second enquiry after spotting other items. That is a direct signal of more to quote, and it was not picked up. Shortest call of the week at 2:43, which is consistent with the discovery not happening."
 
